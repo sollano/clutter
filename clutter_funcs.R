@@ -5,7 +5,7 @@ dados <- read.csv2("dados_clutter.csv")
 head(dados, 10)
 
 ## # Ajustar Clutter e estimar G & V ####
-# Estimar o Site
+## # Estimar o Site (Schummacher) ####
 Idade_I <- 64
 dados <-  dados %>% 
   lm_table(log(HD) ~ inv(Idade), output = "merge") %>% 
@@ -13,15 +13,31 @@ dados <-  dados %>%
   select(-b0, -b1, -Rsqr, -Rsqr_adj, -Std.Error)
 dados
 
-# Rodar Clutter
+## # Estimar o Site (Chapman & Richards) ####
+Idade_I <- 64
+dados <- dados %>% 
+  nls_table(HD ~ b0 * (1 - exp( -b1 * Idade )  )^b2, 
+            mod_start = c( b0=23, b1=0.03, b2 = 1.3   ), output = "merge" ) %>% 
+  mutate(Site = HD *( (  (1- exp( -b1/Idade ))^b2   ) / (( 1 - exp(-b1/Idade_I))^b2 ))  ) %>% 
+  select(-b0, -b1,-b2)
+dados
+
+## # Rodar Clutter ####
 coefs_clutter <- fit_clutter(dados, "Idade", "HD", "B", "V", "Site", "Parcela")
 coefs_clutter
 
-# Classificar os dados
+Idade_I <- 64
+dados <-  dados %>% 
+  lm_table(log(HD) ~ inv(Idade), output = "merge") %>% 
+  mutate(Site = exp(log(HD) - b1 * (1/Idade - 1/Idade_I))  ) %>% 
+  select(-b0, -b1, -Rsqr, -Rsqr_adj, -Std.Error)
+dados
+
+## # Classificar os dados ####
 dados_class <- class_data(dados, Site, 3, Parcela)
 head(dados_class ,15)
 
-# Estimar LN(B2)
+## # Estimar LN(B2) ####
 
 # Metodo da equacao em funcao de B para estimar B1:
 dados_est_ <- est_LN_B2(dados_class, Site_medio, B, 20:125, coefs_clutter$a0, coefs_clutter$a1, Categoria_, method = "media") 
@@ -34,7 +50,7 @@ dados_est_ <- est_LN_B2(dados_class, Site_medio, B, 20:125, coefs_clutter$a0, co
 
 head(dados_est_ ,15)
 
-# Estimar B2, Volume, ICM & IMM & ITC
+## # Estimar B2, Volume, ICM & IMM & ITC ####
 dados_est <- dados_est_ %>% 
   group_by(Categoria_) %>% 
   mutate(

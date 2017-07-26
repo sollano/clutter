@@ -4,37 +4,26 @@ library(ggplot2)
 dados <- read.csv2("dados_clutter.csv")
 head(dados, 10)
 
-## # Ajustar Clutter e estimar G & V ####
-## # Estimar o Site (Schummacher) ####
+## # Ajustar Clutter e estimar B & V ####
+## # Estimar o Site (Schummacher e Chapman & Richards) ####
 Idade_I <- 64
 dados <-  dados %>% 
+  #Schummacher
   lm_table(log(HD) ~ inv(Idade), output = "merge") %>% 
-  mutate(Site = exp(log(HD) - b1 * (1/Idade - 1/Idade_I))  ) %>% 
-  select(-b0, -b1, -Rsqr, -Rsqr_adj, -Std.Error)
-dados
-
-## # Estimar o Site (Chapman & Richards) ####
-Idade_I <- 64
-dados <- dados %>% 
-  nls_table(HD ~ b0 * (1 - exp( -b1 * Idade )  )^b2, 
-            mod_start = c( b0=23, b1=0.03, b2 = 1.3   ), output = "merge" ) %>% 
-  mutate(Site = HD *( (  (1- exp( -b1/Idade ))^b2   ) / (( 1 - exp(-b1/Idade_I))^b2 ))  ) %>% 
-  select(-b0, -b1,-b2)
+  mutate(Site_sch = exp(log(HD) - b1 * (1/Idade - 1/Idade_I))  ) %>% 
+  select(-b0, -b1, -Rsqr, -Rsqr_adj, -Std.Error) %>% 
+  #Chapman & Richards
+  nls_table(HD ~ b0 * (1 - exp( -b1 * Idade )  )^b2, mod_start = c( b0=23, b1=0.03, b2 = 1.3   ), output = "merge" ) %>% 
+  mutate(Site_chap = HD *( (  (1- exp( -b1/Idade ))^b2   ) / (( 1 - exp(-b1/Idade_I))^b2 ))  ) %>% 
+  select(-b0,-b1,-b2)
 dados
 
 ## # Rodar Clutter ####
-coefs_clutter <- fit_clutter(dados, "Idade", "HD", "B", "V", "Site", "Parcela")
+coefs_clutter <- fit_clutter(dados, "Idade", "HD", "B", "V", "Site_sch", "Parcela")
 coefs_clutter
 
-Idade_I <- 64
-dados <-  dados %>% 
-  lm_table(log(HD) ~ inv(Idade), output = "merge") %>% 
-  mutate(Site = exp(log(HD) - b1 * (1/Idade - 1/Idade_I))  ) %>% 
-  select(-b0, -b1, -Rsqr, -Rsqr_adj, -Std.Error)
-dados
-
 ## # Classificar os dados ####
-dados_class <- class_data(dados, Site, 3, Parcela)
+dados_class <- class_data(dados, Site_sch, 3, Parcela)
 head(dados_class ,15)
 
 ## # Estimar LN(B2) ####
@@ -45,7 +34,7 @@ dados_est_ <- est_LN_B2(dados_class, Site_medio, B, 20:125, coefs_clutter$a0, co
 # Metodo da Media como B1:
 dados_est_ <- est_LN_B2(dados_class, Site_medio, B, 20:125, coefs_clutter$a0, coefs_clutter$a1, Categoria_, method = "media")
 
-# dados_est_ <- est_LN_B2(dados_class, Site, B, 20:125, coefs_clutter$a0, coefs_clutter$a1, Categoria_, method = "equacao")
+# dados_est_ <- est_LN_B2(dados_class, Site_chp, B, 20:125, coefs_clutter$a0, coefs_clutter$a1, Categoria_, method = "equacao")
 # Site ou site medio??
 
 head(dados_est_ ,15)

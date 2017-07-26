@@ -81,7 +81,7 @@ graph <- dados_est %>%
   facet_wrap(~Categoria_) + 
   geom_line(aes(y = Valor), size = 1.5) +
   geom_point(aes(x = ITC, y = ITC_Y), color = "black")+
-  geom_text(aes(x = ITC, y = ITC_Y, label = ITC),
+  geom_text(aes(x = ITC, y = ITC_Y, label = ITC, family = "serif"),
             vjust = 0, 
             nudge_y = 0.2, 
             color = "black", size = 5)+

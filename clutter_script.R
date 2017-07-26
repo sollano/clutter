@@ -345,7 +345,7 @@ dados_class <- dados %>%
   left_join(dados,., by = "Parcela") %>%
   round(4) %>% 
   arrange(Site_medio)
-head(dados)
+head(dados_class)
 
 ## Serao utilizadas 3 classes, inferior media e superior (1, 2 e 3).
 ## Entao define-se o numero de classes que sera utilizado:
@@ -644,6 +644,7 @@ dados_est %>%
 
 ## Adiciona-se a ITC aos dados:
 dados_est <- dados_est %>% 
+  group_by(Categoria_) %>% 
   filter(round(ICM,1) == round(IMM,1) ) %>% 
   select(Categoria_, ITC = Idade, ITC_Y = IMM) %>% 
   summarise_all(mean) %>% 
@@ -697,13 +698,18 @@ graph <- ggplot(dados_graph, aes( x = Idade, y = Valor, color = Indice ) ) +
   labs(x = "Idade (meses)",
        y = "Indice",
        color = "Indice") +
-  theme( legend.position = "bottom" ,
-         legend.title = element_text(size=10, 
-                                     face="bold"),
-         legend.text = element_text(size=10),
-    axis.title   = element_text(size = 14), 
-    axis.text    = element_text(size = 12),
-    strip.text.x = element_text(size = 16) )
+  ggthemes::theme_igray(base_family = "serif") +
+  theme(      legend.position = "bottom",
+              legend.title = element_text(size=12,face="bold"),
+              legend.text = element_text(size=12),
+              panel.grid.major = ggplot2::element_blank(), 
+              panel.grid.minor = ggplot2::element_blank(),
+              panel.border = ggplot2::element_blank(),
+              axis.title   = ggplot2::element_text(size = 17), 
+              axis.text    = ggplot2::element_text(size = 15),
+              axis.line.x = ggplot2::element_line(color="black"),
+              axis.line.y = ggplot2::element_line(color="black"),
+              strip.text.x = element_text(size = 19) )
 graph
 
 ## Pode-se adicionar a idade tecnica de corte ao grafico:
@@ -719,13 +725,18 @@ graph2 <- ggplot(dados_graph, aes( x = Idade, color = Indice ) ) +
   labs(x = "Idade (meses)",
        y = "Indice",
        color = "Indice") +
-  theme( legend.position = "bottom" ,
-         legend.title = element_text(size=10, 
-                                     face="bold"),
-         legend.text = element_text(size=10),
-         axis.title   = element_text(size = 14), 
-         axis.text    = element_text(size = 12),
-         strip.text.x = element_text(size = 16) )
+  ggthemes::theme_igray(base_family = "serif") +
+  theme(      legend.position = "bottom",
+              legend.title = element_text(size=12,face="bold"),
+              legend.text = element_text(size=12),
+              panel.grid.major = ggplot2::element_blank(), 
+              panel.grid.minor = ggplot2::element_blank(),
+              panel.border = ggplot2::element_blank(),
+              axis.title   = ggplot2::element_text(size = 17), 
+              axis.text    = ggplot2::element_text(size = 15),
+              axis.line.x = ggplot2::element_line(color="black"),
+              axis.line.y = ggplot2::element_line(color="black"),
+              strip.text.x = element_text(size = 19) )
 graph2
 
 ## Exporta-se o grafico com ggsave:

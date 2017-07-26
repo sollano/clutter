@@ -1,7 +1,9 @@
 ## # Carregar pacote e dados ####
 library(forestr)
+library(ggplot2)
 dados <- read.csv2("dados_clutter.csv")
 head(dados, 10)
+
 ## # Ajustar Clutter e estimar G & V ####
 # Estimar o Site
 Idade_I <- 64
@@ -20,13 +22,16 @@ dados_class <- class_data(dados, Site, 3, Parcela)
 head(dados_class ,15)
 
 # Estimar LN(B2)
+
+# Metodo da equacao em funcao de B para estimar B1:
+dados_est_ <- est_LN_B2(dados_class, Site_medio, B, 20:125, coefs_clutter$a0, coefs_clutter$a1, Categoria_, method = "media") 
+
+# Metodo da Media como B1:
 dados_est_ <- est_LN_B2(dados_class, Site_medio, B, 20:125, coefs_clutter$a0, coefs_clutter$a1, Categoria_, method = "media")
-# estimar usando a media das areas basais como B1
-#dados_est_ <- est_LN_B2(dados_class, Site, B, 20:125, coefs_clutter$a0, coefs_clutter$a1, Categoria_)
 
-#dados_est_ <- est_LN_B2(dados_class, Site_medio, B, 20:125, coefs_clutter$a0, coefs_clutter$a1, Categoria_, method = "modelo") 
-
+# dados_est_ <- est_LN_B2(dados_class, Site, B, 20:125, coefs_clutter$a0, coefs_clutter$a1, Categoria_, method = "equacao")
 # Site ou site medio??
+
 head(dados_est_ ,15)
 
 # Estimar B2, Volume, ICM & IMM & ITC
@@ -72,7 +77,6 @@ tab_final
 ## Pode-se adicionar a idade tecnica de corte ao grafico, com geom_text.
 ## Alem disso, utiliza-se facet_wrap para gerar um grafico para cada classe:
 #+ fig.width = 14, fig.height = 8
-library(ggplot2)
 graph <- dados_est %>% 
   na.omit() %>% 
   select(Categoria_, ICM, IMM, Idade, ITC, ITC_Y) %>% 

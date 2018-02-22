@@ -23,16 +23,16 @@ coefs_clutter <- fit_clutter(dados, "Idade", "HD", "B", "V", "Site_sch", "Parcel
 coefs_clutter
 
 ## # Classificar os dados ####
-dados_class <- class_data(dados, Site_sch, 3, Parcela)
+dados_class <- class_data(dados, "Site_sch", 3, "Parcela")
 head(dados_class ,15)
 
 ## # Estimar LN(B2) ####
 
 # Metodo da equacao em funcao de B para estimar B1:
-dados_est_ <- est_LN_B2(dados_class, Site_medio, B, 20:125, coefs_clutter$a0, coefs_clutter$a1, Categoria_, method = "media") 
+dados_est_ <- est_LN_B2(dados_class, "Site_medio", "B", 20:125, coefs_clutter$a0, coefs_clutter$a1, "Categoria_", method = "modelo") 
 
 # Metodo da Media como B1:
-dados_est_ <- est_LN_B2(dados_class, Site_medio, B, 20:125, coefs_clutter$a0, coefs_clutter$a1, Categoria_, method = "media")
+dados_est_ <- est_LN_B2(dados_class, "Site_medio", "B", 20:125, coefs_clutter$a0, coefs_clutter$a1, "Categoria_", method = "media")
 
 # dados_est_ <- est_LN_B2(dados_class, Site_chp, B, 20:125, coefs_clutter$a0, coefs_clutter$a1, Categoria_, method = "equacao")
 # Site ou site medio??

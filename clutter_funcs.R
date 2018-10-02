@@ -1,5 +1,6 @@
 ## # Carregar pacote e dados ####
 library(forestr)
+library(dplyr)
 library(ggplot2)
 dados <- read.csv2("dados_clutter.csv")
 head(dados, 10)
